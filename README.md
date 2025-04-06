@@ -35,3 +35,8 @@ To use the model use the test.py script:
 ```bash
 python test.py
 ``` 
+
+## Training
+
+![image](https://github.com/user-attachments/assets/38236bce-b63f-4d62-8039-aef5134b4148)
+![image](https://github.com/user-attachments/assets/128d426e-5614-4f4d-8f12-eba69dcdc15e)
