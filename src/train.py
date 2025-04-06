@@ -17,8 +17,6 @@ if __name__ == "__main__":
         decay_steps=1000,
         decay_rate=0.96)
 
-    metrics_callback = TrainingMetricsCallback()
-
     model = create_model()
     model.compile(loss=CategoricalCrossentropy(), optimizer=Adam(learning_rate=lr_schedule),  metrics=['accuracy'])
 
@@ -35,7 +33,15 @@ if __name__ == "__main__":
     if not config.TRAIN_NEW:
         model.load_weights(config.MODEL_PATH)
 
-    model.fit(train_dataset, epochs=config.EPOCHS, validation_data=test_dataset, callbacks=[checkpoint_cb, metrics_callback])
+    history = model.fit(train_dataset, epochs=config.EPOCHS, validation_data=test_dataset, callbacks=[checkpoint_cb])
+
+    plt.plot(history.history['accuracy'], label='accuracy')
+    plt.plot(history.history['val_accuracy'], label='val_accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.show()
+
     model.evaluate(test_dataset)
 
     show_confusion_matrix(model, name_index, test_x, test_y)

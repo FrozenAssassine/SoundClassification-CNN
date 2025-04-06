@@ -10,10 +10,11 @@ from keras.layers import (Activation, BatchNormalization, Conv2D,
                           MaxPooling2D, Reshape)
 from keras.regularizers import l2
 from data_processing import process_audio
+from keras.models import Sequential
 
 
 def create_model():
-    model = keras.models.Sequential(name="model")
+    model = Sequential(name="model")
 
     model.add(InputLayer(shape=(128, 130)))
     model.add(Reshape((128, 130, 1)))
