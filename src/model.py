@@ -8,10 +8,7 @@ import tensorflow as tf
 from keras.layers import (Activation, BatchNormalization, Conv2D,
                           Dense, Dropout, Flatten, InputLayer,
                           MaxPooling2D, Reshape)
-from keras.losses import CategoricalCrossentropy
 from keras.regularizers import l2
-from keras.optimizers import Adam
-
 from data_processing import process_audio
 
 
@@ -75,9 +72,3 @@ def show_confusion_matrix(model, name_index, test_x, test_y):
     _, ax = plt.subplots(1, figsize=(8, 8))
     confusion_matrix_display.plot(ax=ax, xticks_rotation=10)
     plt.show()
-
-
-def create_compile_model(learning_rate):
-    model = create_model()
-    model.compile(loss=CategoricalCrossentropy(), optimizer=Adam(learning_rate=learning_rate), metrics=['accuracy'])
-    return model

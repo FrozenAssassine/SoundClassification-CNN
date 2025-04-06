@@ -5,6 +5,7 @@ import numpy as np
 
 from keras.utils import to_categorical
 import tensorflow as tf
+import config
 
 
 def process_audio(audio_file):
@@ -56,16 +57,25 @@ def create_shuffled_dataframe(csv_path, data_wav_dir, row_count):
     return shuffled_df, name_index
 
 
-def make_training_data(csv_path, data_df_path, data_wav_dir, row_count, train_test_split, use_existing_df=False):
+def load_dataframe_data(data_df_path, row_count, csv_path, data_wav_dir, use_existing_df):
     # load existing dataframe from file or create new one => prompts to save again
     if use_existing_df:
         train_df = pd.read_pickle(data_df_path)
-        _, _, name_index = parse_data(data_df_path, row_count)
+        train_df = train_df.sample(frac=1).reset_index(drop=True)
+
+        _, _, name_index = parse_data(csv_path, row_count)
     else:
         train_df, name_index = create_shuffled_dataframe(csv_path, data_wav_dir, row_count)
         if input("Save dataframe? [yes/no]") == "yes":
             train_df.to_pickle(data_df_path)
             print(f"Saved dataframe to {data_df_path}")
+
+    return train_df, name_index
+
+
+def make_training_data(csv_path, data_df_path, data_wav_dir, row_count, train_test_split, use_existing_df=False):
+
+    train_df, name_index = load_dataframe_data(data_df_path, row_count, csv_path, data_wav_dir, use_existing_df)
 
     (train_x, train_y) = train_df["mel_spec"][0:train_test_split].values, train_df["class"][0:train_test_split].values
     (test_x, test_y) = train_df["mel_spec"][train_test_split:-1].values, train_df["class"][train_test_split:-1].values
@@ -88,8 +98,8 @@ def make_training_data(csv_path, data_df_path, data_wav_dir, row_count, train_te
     test_dataset = tf.data.Dataset.from_tensor_slices((test_x, test_y))
 
     # create batches from the dataset:
-    train_dataset = train_dataset.batch(8)
-    test_dataset = test_dataset.batch(8)
+    train_dataset = train_dataset.batch(config.BATCH_SIZE)
+    test_dataset = test_dataset.batch(config.BATCH_SIZE)
     train_dataset = train_dataset.prefetch(tf.data.AUTOTUNE)
     test_dataset = test_dataset.prefetch(tf.data.AUTOTUNE)
 
